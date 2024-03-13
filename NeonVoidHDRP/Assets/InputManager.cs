@@ -7,10 +7,12 @@ public class InputManager : MonoBehaviour
     PlayerControls playerControls;
 
     Vector2 movementInput;
+    public float verticalInput;
+    public float horizontalInput;
 
     private void OnEnable()
     {
-        if(playerControls != null)
+        if(playerControls == null)
         {
             playerControls = new PlayerControls();
 
@@ -24,5 +26,20 @@ public class InputManager : MonoBehaviour
     private void OnDisable()
     {
         playerControls.Disable();
+    }
+
+    public void HandleAllInputs()
+    {
+        HandleMovementInput();
+
+        //HandleJumpingInput
+        //HandleActionInput
+    }
+
+    private void HandleMovementInput()
+    {
+        verticalInput = movementInput.y;
+        horizontalInput = movementInput.x;
+
     }
 }
