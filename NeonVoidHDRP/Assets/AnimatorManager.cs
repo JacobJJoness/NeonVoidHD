@@ -21,7 +21,7 @@ public class AnimatorManager : MonoBehaviour
 
         float snappedHorizontal;
         float snappedVertical;
-
+        
         #region Snapped Horizontal
         if (horizontalMovement > 0 && horizontalMovement < 0.55f)
         {
@@ -50,15 +50,15 @@ public class AnimatorManager : MonoBehaviour
         {
             snappedVertical = 0.5f;
         }
-        else if (horizontalMovement > 0.55f)
+        else if (verticalMovement > 0.55f)
         {
             snappedVertical = 1;
         }
-        else if (horizontalMovement < 0 && verticalMovement > -0.55f)
+        else if (verticalMovement < 0 && verticalMovement > -0.55f)
         {
             snappedVertical = -0.5f;
         }
-        else if (horizontalMovement < -0.55f)
+        else if (verticalMovement < -0.55f)
         {
             snappedVertical = -1;
         }
