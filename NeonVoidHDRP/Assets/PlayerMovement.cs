@@ -21,7 +21,9 @@ public class PlayerMovement : MonoBehaviour
     public float inAirTimer;
     public float leapingVelocity;
     public float fallingVelocity;
-    public float rayCastHeightOffSet = 0.5f;
+    public float maxDistance = 1;
+
+    public float rayCastHeightOffSet = 2f;
     public LayerMask groundLayer;
 
     [Header("Movement Flags")]
@@ -52,7 +54,10 @@ public class PlayerMovement : MonoBehaviour
         HandleFallingAndLanding();
 
         if (playerManager.isInteracting)
-            return;
+        { return;
+
+        }
+           
 
         HandleMovement();
         HandleRotation();
@@ -127,13 +132,18 @@ public class PlayerMovement : MonoBehaviour
             }
 
             inAirTimer = inAirTimer + Time.deltaTime;
+
             playerRigidbody.AddForce(transform.forward * leapingVelocity);
+
             playerRigidbody.AddForce(-Vector3.up * fallingVelocity * inAirTimer);
+
+            // Debugging: Indicate that the player is currently in the air and not grounded
+            Debug.Log("Player is in the air");
         }
 
 
-        if(Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, groundLayer))
-        {
+        if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, maxDistance, groundLayer))
+            {
             if(!isGrounded && playerManager.isInteracting)
             {
                 animatorManager.PlayTargetAnimation("Landing", true);
@@ -141,6 +151,9 @@ public class PlayerMovement : MonoBehaviour
 
             inAirTimer = 0;
             isGrounded = true;
+
+            // Debugging: Indicate that the player has just become grounded
+            Debug.Log("Player has become grounded");
 
         }
         else
