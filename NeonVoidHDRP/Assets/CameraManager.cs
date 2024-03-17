@@ -8,20 +8,35 @@ public class CameraManager : MonoBehaviour
 
     public Transform targetTransform; // The object the camera will follow
     public Transform cameraPivot; // The object the camera uses to pivot
-    private Vector3 cameraFollowVelocity = Vector3.zero;
+    private float defaultPosition;
+    public Transform cameraTransform; // The transform of the actual camera object in the scene
+    public LayerMask collisionLayers; // The layers we want our camera to collide with
 
+    
+    private Vector3 cameraFollowVelocity = Vector3.zero;
+    private Vector3 cameraVectorPosition;
+
+    public float cameraCollisionOffSet = 0.2f; // How much the camera will jump off of objects it colliding with 
+    public float minimumCollisionOffSet = 0.2f;
+    public float cameraCollisionRadius = 2;
     public float cameraFollowSpeed = 0.2f;
     public float cameraLookSpeed = 2;
     public float cameraPivotSpeed = 2;
 
     public float lookAngle; // Camera looking up and down
     public float pivotAngle; // Camera looking left and right
+    public float minimumPivotAngle = -35;
+    public float maximumPivotAngle = 35;
 
     private void Awake()
     {
         inputManager = FindObjectOfType<InputManager>();
 
-        targetTransform = FindObjectOfType<PlayerManager>().transform; 
+        targetTransform = FindObjectOfType<PlayerManager>().transform;
+
+        cameraTransform = Camera.main.transform;
+
+        defaultPosition = cameraTransform.localPosition.z;
     }
 
 
@@ -29,6 +44,7 @@ public class CameraManager : MonoBehaviour
     {
         FollowTarget();
         RotateCamera();
+        HandleCameraCollisions();
     }
     private void FollowTarget()
     {
@@ -41,13 +57,20 @@ public class CameraManager : MonoBehaviour
 
     private void RotateCamera()
     {
+        Vector3 rotation;
+        Quaternion targetRotation;
+
         lookAngle = lookAngle + (inputManager.cameraInputX * cameraLookSpeed) ;
 
         pivotAngle = pivotAngle - (inputManager.cameraInputY * cameraPivotSpeed);
+        pivotAngle = Mathf.Clamp(pivotAngle, minimumPivotAngle, maximumPivotAngle);
 
-        Vector3 rotation = Vector3.zero;
+
+        rotation = Vector3.zero;
+
         rotation.y = lookAngle;
-        Quaternion targetRotation = Quaternion.Euler(rotation);
+
+        targetRotation = Quaternion.Euler(rotation);
         transform.rotation = targetRotation;
 
         rotation = Vector3.zero;
@@ -57,5 +80,32 @@ public class CameraManager : MonoBehaviour
         targetRotation = Quaternion.Euler(rotation);
 
         cameraPivot.localRotation = targetRotation;
+    }
+
+    private void HandleCameraCollisions()
+    {
+        float targetPosition = defaultPosition;
+
+        RaycastHit hit;
+        Vector3 direction = cameraTransform.position - cameraPivot.position;
+        direction.Normalize();
+
+        if (Physics.SphereCast(cameraPivot.transform.position, cameraCollisionRadius, direction, out hit, Mathf.Abs(targetPosition), collisionLayers))
+        {
+            // Debug log to indicate a wall or obstacle has been detected
+            Debug.Log("Wall detected: " + hit.collider.gameObject.name);
+
+            float distance = Vector3.Distance(cameraPivot.position, hit.point);
+            targetPosition =- (distance - cameraCollisionOffSet);
+
+        }
+
+        if (Mathf.Abs(targetPosition) < minimumCollisionOffSet)
+        {
+            targetPosition = targetPosition - minimumCollisionOffSet;
+        }
+
+        cameraVectorPosition.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPosition, Time.deltaTime * 10); // Increase the rate of interpolation
+        cameraTransform.localPosition = cameraVectorPosition;
     }
 }

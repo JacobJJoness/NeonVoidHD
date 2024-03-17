@@ -479,8 +479,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4effac4b0994b64595c72f1b4b9a411, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTransform: {fileID: 1311875793}
+  targetTransform: {fileID: 0}
+  cameraPivot: {fileID: 1311875793}
   cameraFollowSpeed: 0.2
+  cameraLookSpeed: 2
+  cameraPivotSpeed: 2
+  lookAngle: 0
+  pivotAngle: 0
 --- !u!4 &305582564
 Transform:
   m_ObjectHideFlags: 0
@@ -1080,6 +1085,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90563b436e00e5a41a83a66ec26cd2fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementInput: {x: 0, y: 0}
+  cameraInput: {x: 0, y: 0}
+  cameraInputX: 0
+  cameraInputY: 0
   verticalInput: 0
   horizontalInput: 0
 --- !u!136 &1314978299
