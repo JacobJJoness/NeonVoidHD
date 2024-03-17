@@ -6,10 +6,14 @@ public class PlayerManager : MonoBehaviour
 {
     InputManager inputManager;
     CameraManager cameraManager;
+    Animator animator;
     PlayerMovement playerLocomotion;
+
+    public bool isInteracting;
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         inputManager = GetComponentInChildren<InputManager>();
         cameraManager = FindObjectOfType<CameraManager>();
         playerLocomotion = GetComponentInChildren<PlayerMovement>();
@@ -28,5 +32,7 @@ public class PlayerManager : MonoBehaviour
     private void LateUpdate()
     {
         cameraManager.HandleAllCameraMovement();
+
+        isInteracting = animator.GetBool("isInteracting");
     }
 }
