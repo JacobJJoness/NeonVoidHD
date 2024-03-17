@@ -53,9 +53,11 @@ public class PlayerMovement : MonoBehaviour
         HandleFallingAndLanding();
 
         if (playerManager.isInteracting)
-        { return;
+        {
+            return;
 
         }
+            
            
 
         HandleMovement();
@@ -143,16 +145,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, groundLayer))
             {
-            if(!isGrounded && playerManager.isInteracting)
+            if(!isGrounded && !playerManager.isInteracting)
             {
                 animatorManager.PlayTargetAnimation("Landing", true);
+
             }
+
 
             inAirTimer = 0;
             isGrounded = true;
-
-            // Debugging: Indicate that the player has just become grounded
-            Debug.Log("Player has become grounded");
+            playerManager.isInteracting = false;
 
         }
         else

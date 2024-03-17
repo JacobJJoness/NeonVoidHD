@@ -7509,7 +7509,6 @@ MonoBehaviour:
   inAirTimer: 0
   leapingVelocity: 3
   fallingVelocity: 33
-  maxDistance: 1
   rayCastHeightOffSet: 0.5
   groundLayer:
     serializedVersion: 2

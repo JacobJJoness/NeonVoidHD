@@ -10,6 +10,7 @@ public class ResetBool : StateMachineBehaviour
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        Debug.Log("Exiting the state.");
         animator.SetBool(isInteractingBool, isInteractingStatus);
     }
 
