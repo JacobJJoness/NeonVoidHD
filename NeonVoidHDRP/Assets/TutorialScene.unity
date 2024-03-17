@@ -2194,7 +2194,7 @@ Transform:
   m_GameObject: {fileID: 305582562}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.28, y: 5.49, z: -3.27}
+  m_LocalPosition: {x: -0.28, y: 11.34, z: -3.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7444,6 +7444,7 @@ MonoBehaviour:
   verticalInput: 0
   horizontalInput: 0
   b_Input: 0
+  jump_Input: 0
 --- !u!136 &1314978299
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -7515,10 +7516,13 @@ MonoBehaviour:
     m_Bits: 1
   isSprinting: 0
   isGrounded: 1
+  isJumping: 0
   walkingSpeed: 1.5
   runningSpeed: 5
   sprintingSpeed: 10
   rotationSpeed: 15
+  jumpHeight: 3
+  gravityIntensity: -15
 --- !u!114 &1314978302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7544,6 +7548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f05c7fd8a5bde44490738f0d38baa73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
 --- !u!95 &1314978304
 Animator:
   serializedVersion: 5

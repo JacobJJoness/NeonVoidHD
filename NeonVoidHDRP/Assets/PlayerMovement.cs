@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Flags")]
     public bool isSprinting;
     public bool isGrounded;
+    public bool isJumping;
 
     [Header("Movement Speeds")]
     public float walkingSpeed = 1.5f;
@@ -37,6 +38,11 @@ public class PlayerMovement : MonoBehaviour
     public float sprintingSpeed = 7;
 
     public float rotationSpeed = 15;
+
+    [Header("Jump Speeds")]
+    public float jumpHeight = 3;
+    public float gravityIntensity = -15;
+
 
 
     private void Awake()
@@ -65,6 +71,9 @@ public class PlayerMovement : MonoBehaviour
     }
     private void HandleMovement()
     {
+        if (isJumping)
+            return;
+
         moveDirection = cameraObject.forward * inputManager.verticalInput; // Movement Input
         moveDirection = moveDirection + cameraObject.right * inputManager.horizontalInput;
         moveDirection.Normalize();
@@ -98,6 +107,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRotation()
     {
+        if (isJumping)
+            return;
+
         Vector3 targetDirection = Vector3.zero;
 
         targetDirection = cameraObject.forward * inputManager.verticalInput;
@@ -125,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 rayCastOrigin = transform.position;
         rayCastOrigin.y = rayCastOrigin.y + rayCastHeightOffSet;
 
-        if(!isGrounded)
+        if(!isGrounded && !isJumping)
         {
             if(!playerManager.isInteracting)
             {
@@ -165,4 +177,22 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
 
     }
+
+    public void HandleJumping()
+    {
+        if(isGrounded)
+        {
+            animatorManager.animator.SetBool("isJumping", true);
+
+            animatorManager.PlayTargetAnimation("Jumping", false);
+
+            float jumpingVelocity = Mathf.Sqrt(-2 * gravityIntensity * jumpHeight);
+            Vector3 playerVelocity = moveDirection;
+
+            playerVelocity.y = jumpingVelocity;
+            playerRigidbody.velocity = playerVelocity; 
+
+        }
+    }
 }
+
