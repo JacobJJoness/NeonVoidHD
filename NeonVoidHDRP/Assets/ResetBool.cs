@@ -7,11 +7,15 @@ public class ResetBool : StateMachineBehaviour
     public string isInteractingBool;
     public bool isInteractingStatus;
 
+    public string isUsingRootMotionBool;
+    public bool isUsingRootMotionStatus;
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         Debug.Log("Exiting the state.");
         animator.SetBool(isInteractingBool, isInteractingStatus);
+        animator.SetBool(isUsingRootMotionBool, isUsingRootMotionStatus);
     }
 
     

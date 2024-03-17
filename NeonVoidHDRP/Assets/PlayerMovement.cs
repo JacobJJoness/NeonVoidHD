@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     Transform cameraObject;
 
-    Rigidbody playerRigidbody;
+    public Rigidbody playerRigidbody;
 
     [Header("Falling")]
     public float inAirTimer;
@@ -147,6 +147,7 @@ public class PlayerMovement : MonoBehaviour
                 animatorManager.PlayTargetAnimation("Falling", true);
             }
 
+            animatorManager.animator.SetBool("isUsingRootMotion", false);
             inAirTimer = inAirTimer + Time.deltaTime;
 
             playerRigidbody.AddForce(transform.forward * leapingVelocity);
@@ -167,9 +168,13 @@ public class PlayerMovement : MonoBehaviour
             }
 
             Vector3 rayCastHitPoint = hit.point;
+
             targetPosition.y = rayCastHitPoint.y; 
+
             inAirTimer = 0;
+
             isGrounded = true;
+
             playerManager.isInteracting = false;
 
         }
@@ -209,6 +214,17 @@ public class PlayerMovement : MonoBehaviour
             playerRigidbody.velocity = playerVelocity; 
 
         }
+    }
+
+    public void HandleDodge()
+    {
+        if (playerManager.isInteracting)
+            return;
+
+        animatorManager.PlayTargetAnimation("Dodge", true, true);
+
+       
+
     }
 }
 
