@@ -135,7 +135,10 @@ public class PlayerMovement : MonoBehaviour
     {
         RaycastHit hit;
         Vector3 rayCastOrigin = transform.position;
+        Vector3 targetPosition;
         rayCastOrigin.y = rayCastOrigin.y + rayCastHeightOffSet;
+
+        targetPosition = transform.position; 
 
         if(!isGrounded && !isJumping)
         {
@@ -163,7 +166,8 @@ public class PlayerMovement : MonoBehaviour
 
             }
 
-
+            Vector3 rayCastHitPoint = hit.point;
+            targetPosition.y = rayCastHitPoint.y; 
             inAirTimer = 0;
             isGrounded = true;
             playerManager.isInteracting = false;
@@ -172,6 +176,18 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             isGrounded = false;
+        }
+
+        if (isGrounded && !isJumping)
+        {
+            if (playerManager.isInteracting || inputManager.moveAmount > 0)
+            {
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime / 0.1f);
+            }
+            else
+            {
+                transform.position = targetPosition;
+            }
         }
 
         Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
