@@ -21,9 +21,8 @@ public class PlayerMovement : MonoBehaviour
     public float inAirTimer;
     public float leapingVelocity;
     public float fallingVelocity;
-    public float maxDistance = 1;
 
-    public float rayCastHeightOffSet = 2f;
+    public float rayCastHeightOffSet = 0.5f;
     public LayerMask groundLayer;
 
     [Header("Movement Flags")]
@@ -142,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, maxDistance, groundLayer))
+        if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, groundLayer))
             {
             if(!isGrounded && playerManager.isInteracting)
             {
@@ -160,6 +159,8 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
+
+        Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
 
     }
 }
