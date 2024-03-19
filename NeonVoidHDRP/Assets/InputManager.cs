@@ -22,16 +22,18 @@ public class InputManager : MonoBehaviour
     public bool x_Input;
     public bool jump_Input;
 
+    public bool dash_Input;
+
     private void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
-        
+
         playerMovement = GetComponent<PlayerMovement>();
     }
 
     private void OnEnable()
     {
-        if(playerControls == null)
+        if (playerControls == null)
         {
             playerControls = new PlayerControls();
 
@@ -42,7 +44,8 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.B.canceled += i => b_Input = false;
             playerControls.PlayerActions.X.performed += i => x_Input = true;
             playerControls.PlayerActions.Jump.performed += i => jump_Input = true;
-            
+            playerControls.PlayerActions.Dash.performed += i => dash_Input = true;
+
 
         }
 
@@ -60,6 +63,7 @@ public class InputManager : MonoBehaviour
         HandleSprintingInput();
         HandleJumpingInput();
         HandleDodgeInput();
+        HandleDashInput();
     }
 
     private void HandleMovementInput()
@@ -96,13 +100,22 @@ public class InputManager : MonoBehaviour
             playerMovement.HandleJumping();
         }
     }
+    private void HandleDashInput()
+    {
+        if (dash_Input)
+        {
+            dash_Input = false;
+            playerMovement.Dash();
+        }
+    }
 
     private void HandleDodgeInput()
     {
-        if(x_Input)
+        if (x_Input)
         {
             x_Input = false;
             playerMovement.HandleDodge();
         }
     }
+
 }

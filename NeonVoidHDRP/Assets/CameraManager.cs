@@ -12,7 +12,7 @@ public class CameraManager : MonoBehaviour
     public Transform cameraTransform; // The transform of the actual camera object in the scene
     public LayerMask collisionLayers; // The layers we want our camera to collide with
 
-    
+
     private Vector3 cameraFollowVelocity = Vector3.zero;
     private Vector3 cameraVectorPosition;
 
@@ -30,6 +30,10 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
+        // locking cursor in middle of screen - Jacob Jones
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         inputManager = FindObjectOfType<InputManager>();
 
         targetTransform = FindObjectOfType<PlayerManager>().transform;
@@ -60,7 +64,7 @@ public class CameraManager : MonoBehaviour
         Vector3 rotation;
         Quaternion targetRotation;
 
-        lookAngle = lookAngle + (inputManager.cameraInputX * cameraLookSpeed) ;
+        lookAngle = lookAngle + (inputManager.cameraInputX * cameraLookSpeed);
 
         pivotAngle = pivotAngle - (inputManager.cameraInputY * cameraPivotSpeed);
         pivotAngle = Mathf.Clamp(pivotAngle, minimumPivotAngle, maximumPivotAngle);
@@ -96,7 +100,7 @@ public class CameraManager : MonoBehaviour
             Debug.Log("Wall detected: " + hit.collider.gameObject.name);
 
             float distance = Vector3.Distance(cameraPivot.position, hit.point);
-            targetPosition =- (distance - cameraCollisionOffSet);
+            targetPosition = -(distance - cameraCollisionOffSet);
 
         }
 

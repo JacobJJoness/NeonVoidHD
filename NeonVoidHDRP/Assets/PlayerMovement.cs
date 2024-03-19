@@ -17,6 +17,10 @@ public class PlayerMovement : MonoBehaviour
 
     public Rigidbody playerRigidbody;
 
+    private bool isDashing;
+    private float dashTimer;
+    private Vector3 dashDirection;
+
     [Header("Falling")]
     public float inAirTimer;
     public float leapingVelocity;
@@ -44,16 +48,21 @@ public class PlayerMovement : MonoBehaviour
     public float gravityIntensity = -15;
 
 
+    [Header("Dash Speeds")]
+    public float dashDistance = 5;
+    public float dashDuration = 1;
 
+    //Awake is used instead of start to ensure that the script is loaded before any other script
     private void Awake()
     {
-        playerManager = GetComponent<PlayerManager>(); 
+        playerManager = GetComponent<PlayerManager>();
         animatorManager = GetComponent<AnimatorManager>();
         inputManager = GetComponent<InputManager>();
         playerRigidbody = GetComponent<Rigidbody>();
         cameraObject = Camera.main.transform;
     }
 
+    // Update is called once per frame, acting as the Update() method in the PlayerManager script
     public void HandleAllMovement()
     {
         HandleFallingAndLanding();
@@ -63,12 +72,15 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         }
-            
-           
+
+
 
         HandleMovement();
         HandleRotation();
+        HandleDash();
     }
+
+    //WASD Movement and Sprinting
     private void HandleMovement()
     {
         if (isJumping)
@@ -96,15 +108,16 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
-        
+
 
         Vector3 movementVelocity = moveDirection;
 
         playerRigidbody.velocity = movementVelocity;
 
-        
+
     }
 
+    //Rotating the player to face the direction of movement
     private void HandleRotation()
     {
         if (isJumping)
@@ -116,9 +129,9 @@ public class PlayerMovement : MonoBehaviour
         targetDirection = targetDirection + cameraObject.right * inputManager.horizontalInput;
         targetDirection.Normalize();
 
-        targetDirection.y = 0;  
+        targetDirection.y = 0;
 
-        if(targetDirection == Vector3.zero)
+        if (targetDirection == Vector3.zero)
         {
             targetDirection = transform.forward;
         }
@@ -130,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
-
+    //Handles the falling and landing of the player
     private void HandleFallingAndLanding()
     {
         RaycastHit hit;
@@ -138,16 +151,17 @@ public class PlayerMovement : MonoBehaviour
         Vector3 targetPosition;
         rayCastOrigin.y = rayCastOrigin.y + rayCastHeightOffSet;
 
-        targetPosition = transform.position; 
+        targetPosition = transform.position;
 
-        if(!isGrounded && !isJumping)
+
+        if (!isGrounded && !isJumping)// If the player is not grounded and not jumping, then the player is falling
         {
-            if(!playerManager.isInteracting)
+            if (!playerManager.isInteracting)// If the player is not interacting with anything, then falling animation is played
             {
                 animatorManager.PlayTargetAnimation("Falling", true);
             }
 
-            animatorManager.animator.SetBool("isUsingRootMotion", false);
+            animatorManager.animator.SetBool("isUsingRootMotion", false);// The player is not using root motion
             inAirTimer = inAirTimer + Time.deltaTime;
 
             playerRigidbody.AddForce(transform.forward * leapingVelocity);
@@ -159,9 +173,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
+        //Handliong the lighting and shadow of player
         if (Physics.SphereCast(rayCastOrigin, 0.2f, -Vector3.up, out hit, groundLayer))
-            {
-            if(!isGrounded && !playerManager.isInteracting)
+        {
+            if (!isGrounded && !playerManager.isInteracting)
             {
                 animatorManager.PlayTargetAnimation("Landing", true);
 
@@ -169,7 +184,7 @@ public class PlayerMovement : MonoBehaviour
 
             Vector3 rayCastHitPoint = hit.point;
 
-            targetPosition.y = rayCastHitPoint.y; 
+            targetPosition.y = rayCastHitPoint.y;
 
             inAirTimer = 0;
 
@@ -201,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleJumping()
     {
-        if(isGrounded)
+        if (isGrounded)
         {
             animatorManager.animator.SetBool("isJumping", true);
 
@@ -211,7 +226,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 playerVelocity = moveDirection;
 
             playerVelocity.y = jumpingVelocity;
-            playerRigidbody.velocity = playerVelocity; 
+            playerRigidbody.velocity = playerVelocity;
 
         }
     }
@@ -223,8 +238,38 @@ public class PlayerMovement : MonoBehaviour
 
         animatorManager.PlayTargetAnimation("Dodge", true, true);
 
-       
 
+
+    }
+    private void HandleDash()
+    {
+        if (isDashing)
+        {
+            dashTimer -= Time.deltaTime;
+
+            if (dashTimer <= 0f)
+            {
+                isDashing = false;
+                playerRigidbody.velocity = Vector3.zero;
+            }
+            else
+            {
+                playerRigidbody.velocity = dashDirection * dashDistance / dashDuration;
+            }
+        }
+    }
+
+    public void Dash()
+    {
+        if (!isDashing)
+        {
+            isDashing = true;
+            dashTimer = dashDuration;
+            dashDirection = cameraObject.forward * inputManager.verticalInput;
+            dashDirection += cameraObject.right * inputManager.horizontalInput;
+            dashDirection.Normalize();
+            dashDirection.y = 0f;
+        }
     }
 }
 
