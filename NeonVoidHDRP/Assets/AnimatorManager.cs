@@ -95,9 +95,9 @@ public class AnimatorManager : MonoBehaviour
 
     private void OnAnimatorMove()
     {
-        if(playerManager.isUsingRootMotion)
-        {
+        //if(playerManager.isUsingRootMotion)
+        //{
 
-        }
+        //}
     }
 }
