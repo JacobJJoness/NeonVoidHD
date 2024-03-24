@@ -6,7 +6,9 @@ public class InputManager : MonoBehaviour
 {
     PlayerControls playerControls;
     PlayerMovement playerMovement;
+    PickUpController pickUpController;
     AnimatorManager animatorManager;
+    WeaponScript weaponScript;
 
     public Vector2 movementInput;
     public Vector2 cameraInput;
@@ -21,6 +23,8 @@ public class InputManager : MonoBehaviour
     public bool b_Input;
     public bool x_Input;
     public bool jump_Input;
+    public bool shoot_Input;
+    public bool pickUp_Input;
 
     public bool dash_Input;
 
@@ -46,7 +50,11 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.Jump.performed += i => jump_Input = true;
             playerControls.PlayerActions.Dash.performed += i => dash_Input = true;
 
-
+            // Setup for Shoot and Pick Up actions
+            playerControls.PlayerActions.Shoot.performed += _ => shoot_Input = true;
+            playerControls.PlayerActions.Shoot.canceled += _ => shoot_Input = false;
+            playerControls.PlayerActions.PickUp.performed += _ => pickUp_Input = true;
+            playerControls.PlayerActions.PickUp.canceled += _ => pickUp_Input = false;
         }
 
         playerControls.Enable();
@@ -64,6 +72,8 @@ public class InputManager : MonoBehaviour
         HandleJumpingInput();
         HandleDodgeInput();
         HandleDashInput();
+        HandleShootInput();
+        HandlePickUpInput();
     }
 
     private void HandleMovementInput()
@@ -115,6 +125,28 @@ public class InputManager : MonoBehaviour
         {
             x_Input = false;
             playerMovement.HandleDodge();
+        }
+    }
+
+    // Additional methods to handle Shoot and Pick Up inputs
+    private void HandleShootInput()
+    {
+        if (shoot_Input)
+        {
+            shoot_Input = false; // Reset the input
+                                 // Assuming you have a reference to the WeaponScript component
+            weaponScript.Shoot();
+        }
+    }
+
+
+    private void HandlePickUpInput()
+    {
+        if (pickUp_Input)
+        {
+            pickUpController.PickUpGun();
+            pickUp_Input = false;  // Reset the pick up input
+            
         }
     }
 

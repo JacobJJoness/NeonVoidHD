@@ -169,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
             playerRigidbody.AddForce(-Vector3.up * fallingVelocity * inAirTimer);
 
             // Debugging: Indicate that the player is currently in the air and not grounded
-            Debug.Log("Player is in the air");
+           // Debug.Log("Player is in the air");
         }
 
 
@@ -210,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
+        //Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
 
     }
 
