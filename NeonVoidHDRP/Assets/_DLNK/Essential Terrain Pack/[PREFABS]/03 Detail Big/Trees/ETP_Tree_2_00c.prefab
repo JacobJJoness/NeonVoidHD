@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 425990}
-  - component: {fileID: 8103392132448786137}
+  - component: {fileID: 3616077405318731478}
+  - component: {fileID: -3177229617114565148}
   m_Layer: 0
   m_Name: ETP_Tree_2_00c
   m_TagString: PW - Prop
@@ -33,7 +34,7 @@ Transform:
   - {fileID: 5991326145639647337}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &8103392132448786137
+--- !u!23 &3616077405318731478
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -53,7 +54,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7df677a6f3b19124faea4c2c8c520111, type: 2}
+  - {fileID: 2100000, guid: 2ff75d0ad95692942b7ab8433c8a4047, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -75,6 +76,36 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!205 &-3177229617114565148
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191482}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0.6514244, y: 2.2209933, z: -0.71874046}
+  m_Size: 7.1130447
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.6
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5461029375015817477}
+    - renderer: {fileID: 3165307025496389420}
+  - screenRelativeHeight: 0.3
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5461029375015817477}
+    - renderer: {fileID: 3165307025496389420}
+  - screenRelativeHeight: 0.1
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 3165307025496389420}
+    - renderer: {fileID: 5461029375015817477}
+  m_Enabled: 1
 --- !u!1 &1991221367999638066
 GameObject:
   m_ObjectHideFlags: 0
