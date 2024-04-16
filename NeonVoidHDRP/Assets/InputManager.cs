@@ -8,7 +8,8 @@ public class InputManager : MonoBehaviour
     PlayerMovement playerMovement;
     PickUpController pickUpController;
     AnimatorManager animatorManager;
-    WeaponScript weaponScript;
+
+    public WeaponScript weaponScript;  // This will be assigned dynamically.
 
     public Vector2 movementInput;
     public Vector2 cameraInput;
@@ -25,17 +26,21 @@ public class InputManager : MonoBehaviour
     public bool jump_Input;
     public bool shoot_Input;
     public bool pickUp_Input;
+    public bool drop_Input; 
+
 
     public bool dash_Input;
 
     private void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
-
         playerMovement = GetComponent<PlayerMovement>();
+        pickUpController = GetComponent<PickUpController>();
+
+        InitializeControls();
     }
 
-    private void OnEnable()
+    private void InitializeControls()
     {
         if (playerControls == null)
         {
@@ -43,26 +48,38 @@ public class InputManager : MonoBehaviour
 
             playerControls.PlayerMovement.Movement.performed += i => movementInput = i.ReadValue<Vector2>();
             playerControls.PlayerMovement.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
-
             playerControls.PlayerActions.B.performed += i => b_Input = true;
             playerControls.PlayerActions.B.canceled += i => b_Input = false;
             playerControls.PlayerActions.X.performed += i => x_Input = true;
             playerControls.PlayerActions.Jump.performed += i => jump_Input = true;
             playerControls.PlayerActions.Dash.performed += i => dash_Input = true;
-
-            // Setup for Shoot and Pick Up actions
             playerControls.PlayerActions.Shoot.performed += _ => shoot_Input = true;
             playerControls.PlayerActions.Shoot.canceled += _ => shoot_Input = false;
             playerControls.PlayerActions.PickUp.performed += _ => pickUp_Input = true;
             playerControls.PlayerActions.PickUp.canceled += _ => pickUp_Input = false;
-        }
+            playerControls.PlayerActions.Drop.performed += _ => drop_Input = true;
+            playerControls.PlayerActions.Drop.canceled += _ => drop_Input = false;
 
+        }
+    }
+
+    private void OnEnable()
+    {
         playerControls.Enable();
     }
 
     private void OnDisable()
     {
         playerControls.Disable();
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Mouse button clicked directly checked");
+        }
+        HandleAllInputs();
     }
 
     public void HandleAllInputs()
@@ -74,32 +91,38 @@ public class InputManager : MonoBehaviour
         HandleDashInput();
         HandleShootInput();
         HandlePickUpInput();
+        HandleDropInput(); // Add this call to handle the drop action
     }
 
+    private void HandleDropInput()
+    {
+        if (drop_Input)
+        {
+            Debug.Log("Drop input received.");
+            drop_Input = false; // Reset the input flag
+            if (pickUpController != null)
+            {
+                pickUpController.DropGun(); // Call DropGun method
+            }
+            else
+            {
+                Debug.LogError("PickUpController is not assigned.");
+            }
+        }
+    }
     private void HandleMovementInput()
     {
         verticalInput = movementInput.y;
         horizontalInput = movementInput.x;
-
         cameraInputY = cameraInput.y;
         cameraInputX = cameraInput.x;
-
         moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
         animatorManager.UpdateAnimatorValues(0, moveAmount, playerMovement.isSprinting);
-
     }
 
     private void HandleSprintingInput()
     {
-        if (b_Input && moveAmount > 0.5f)
-        {
-            playerMovement.isSprinting = true;
-
-        }
-        else
-        {
-            playerMovement.isSprinting = false;
-        }
+        playerMovement.isSprinting = (b_Input && moveAmount > 0.5f);
     }
 
     private void HandleJumpingInput()
@@ -110,6 +133,7 @@ public class InputManager : MonoBehaviour
             playerMovement.HandleJumping();
         }
     }
+
     private void HandleDashInput()
     {
         if (dash_Input)
@@ -128,26 +152,38 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    // Additional methods to handle Shoot and Pick Up inputs
     private void HandleShootInput()
     {
-        if (shoot_Input)
+        if (shoot_Input && weaponScript != null && weaponScript.canShoot)
         {
-            shoot_Input = false; // Reset the input
-                                 // Assuming you have a reference to the WeaponScript component
+            Debug.Log("Shooting input received and weapon is ready.");
+            shoot_Input = false;
             weaponScript.Shoot();
         }
+        else
+        {
+            if (shoot_Input)
+            {
+                Debug.Log("Shoot input received but weapon is not ready or not assigned.");
+            }
+        }
     }
-
 
     private void HandlePickUpInput()
     {
         if (pickUp_Input)
         {
             pickUpController.PickUpGun();
-            pickUp_Input = false;  // Reset the pick up input
-            
+            pickUp_Input = false;
         }
+    }
+
+    // Dynamic assignment of weaponScript
+    public void AssignWeaponScript(WeaponScript newWeaponScript)
+    {
+        weaponScript = newWeaponScript;
+        weaponScript.canShoot = true;
+        Debug.Log("WeaponScript assigned and can shoot enabled");
     }
 
 }
