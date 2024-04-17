@@ -399,7 +399,7 @@ MonoBehaviour:
       m_RotationOrder: 4
   scatteringTint:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_Value: {r: 0.69425166, g: 0.19579923, b: 0.754717, a: 1}
   powderEffectIntensity:
     m_OverrideState: 0
     m_Value: 0.25
@@ -511,6 +511,22 @@ MonoBehaviour:
   m_ObsoleteShapeOffsetZ:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-5750915787258511924
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f1984a7ac01bf84b86559f7595cdc68, type: 3}
+  m_Name: LightCluster
+  m_EditorClassIdentifier: 
+  active: 1
+  cameraClusterRange:
+    m_OverrideState: 0
+    m_Value: 10
 --- !u!114 &-4886291145004336797
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -572,10 +588,10 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.103
+    m_Value: 0.655
   scatter:
     m_OverrideState: 1
-    m_Value: 0.7
+    m_Value: 0.498
   tint:
     m_OverrideState: 1
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -612,7 +628,7 @@ MonoBehaviour:
   active: 1
   quality:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 2
   enabled:
     m_OverrideState: 1
     m_Value: 1
@@ -624,7 +640,7 @@ MonoBehaviour:
     m_Value: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   tint:
     m_OverrideState: 1
-    m_Value: {r: 0.5639696, g: 0, b: 0.5849056, a: 1}
+    m_Value: {r: 0.254717, g: 0.13336597, b: 0.1837175, a: 1}
   maxFogDistance:
     m_OverrideState: 1
     m_Value: 5000
@@ -678,7 +694,7 @@ MonoBehaviour:
     m_Value: 64
   m_VolumetricFogBudget:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.75
   m_ResolutionDepthRatio:
     m_OverrideState: 1
     m_Value: 0.5
@@ -729,6 +745,7 @@ MonoBehaviour:
   - {fileID: 2332098669739383734}
   - {fileID: -390464821610743152}
   - {fileID: -4886291145004336797}
+  - {fileID: -5750915787258511924}
 --- !u!114 &95651393727854112
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1026,7 +1043,7 @@ MonoBehaviour:
   active: 1
   quality:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 3
   enable:
     m_OverrideState: 1
     m_Value: 1
@@ -1053,7 +1070,7 @@ MonoBehaviour:
     m_Value: 0
   m_DenoiserRadiusSS:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.468
   m_SecondDenoiserPassSS:
     m_OverrideState: 1
     m_Value: 1
