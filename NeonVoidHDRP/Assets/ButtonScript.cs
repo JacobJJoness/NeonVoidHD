@@ -8,8 +8,6 @@ public class ButtonScript : MonoBehaviour, IPointerClickHandler
     public RectTransform imageTransform; // Reference to the RectTransform of the image you want to zoom
     public float zoomScale = 1.5f; // Amount to scale the image by when clicked
     public float zoomDuration = 0.2f; // Duration of the zoom animation
-    public Image blackOverlay; // Reference to the Image component for the black overlay
-    public float overlayAlpha = 0.5f; // Alpha value of the black overlay
 
     private Vector3 originalScale; // Original scale of the image
 
@@ -18,17 +16,11 @@ public class ButtonScript : MonoBehaviour, IPointerClickHandler
     {
         // Store the original scale of the image
         originalScale = imageTransform.localScale;
-
-        // Hide the black overlay initially
-        blackOverlay.gameObject.SetActive(false);
     }
 
     // Called when the button is clicked
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Show the black overlay
-        blackOverlay.gameObject.SetActive(true);
-
         // Start a coroutine to perform the zoom animation
         StartCoroutine(ZoomAnimation());
     }
@@ -58,8 +50,5 @@ public class ButtonScript : MonoBehaviour, IPointerClickHandler
 
         // Ensure the image reaches the exact target scale
         imageTransform.localScale = targetScale;
-
-        // Hide the black overlay
-        blackOverlay.gameObject.SetActive(false);
     }
 }
