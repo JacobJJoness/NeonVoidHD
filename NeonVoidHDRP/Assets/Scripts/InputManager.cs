@@ -14,6 +14,9 @@ public class InputManager : MonoBehaviour
     public Vector2 movementInput;
     public Vector2 cameraInput;
 
+    private CarController nearCar; // Car the player is near
+    private bool isNearCar = false; // Is the player near the car
+
     public float cameraInputX;
     public float cameraInputY;
 
@@ -26,10 +29,15 @@ public class InputManager : MonoBehaviour
     public bool jump_Input;
     public bool shoot_Input;
     public bool pickUp_Input;
-    public bool drop_Input; 
+    public bool drop_Input;
+    public bool car_exit_Input;
 
 
     public bool dash_Input;
+
+    public bool isInCar = false;
+
+
 
     private void Awake()
     {
@@ -59,6 +67,8 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.PickUp.canceled += _ => pickUp_Input = false;
             playerControls.PlayerActions.Drop.performed += _ => drop_Input = true;
             playerControls.PlayerActions.Drop.canceled += _ => drop_Input = false;
+            playerControls.PlayerActions.ExitCar.performed += _ => car_exit_Input = true;
+            playerControls.PlayerActions.ExitCar.canceled += _ => car_exit_Input = false;
 
         }
     }
@@ -84,6 +94,24 @@ public class InputManager : MonoBehaviour
 
     public void HandleAllInputs()
     {
+        if (isInCar)
+        {
+            HandleCarInput();
+        }
+        else
+        {
+
+            HandleStandardInputs();          
+        }
+
+        if (car_exit_Input && isInCar)
+        {
+            HandleExitCar();
+        }
+    }
+
+    private void HandleStandardInputs()
+    {
         HandleMovementInput();
         HandleSprintingInput();
         HandleJumpingInput();
@@ -91,8 +119,37 @@ public class InputManager : MonoBehaviour
         HandleDashInput();
         HandleShootInput();
         HandlePickUpInput();
-        HandleDropInput(); // Add this call to handle the drop action
+        HandleDropInput();
     }
+
+    private void HandleCarInput()
+    {
+        // Handle car-specific inputs like driving, braking, etc.
+    }
+
+    private void HandleExitCar()
+    {
+        Debug.Log("Exiting the car now.");
+        //nearCar.ExitCar(this);
+        isInCar = false;
+        car_exit_Input = false; // Ensure to reset to avoid repeating exit
+    }
+
+    // Add similar method for entering the car
+    public void EnterCar()
+    {
+        Debug.Log("Entering the car now.");
+        isInCar = true;
+        // Code to switch controls to the car and adjust the camera
+    }
+
+    public void SetNearCar(CarController car, bool isNear)
+    {
+        nearCar = isNear ? car : null;
+        isNearCar = isNear;
+    }
+
+
 
     private void HandleDropInput()
     {
@@ -173,10 +230,23 @@ public class InputManager : MonoBehaviour
     {
         if (pickUp_Input)
         {
-            pickUpController.PickUpGun();
+            if (isNearCar && nearCar != null)
+            {
+                // Enter the car and pass this InputManager instance
+                //nearCar.EnterCar(this);
+                // Note: The camera switch is handled within the EnterCar() now
+                isInCar = true;
+            }
+            else
+            {
+                // Proceed to pick up items as usual if not near the car
+                pickUpController.PickUpGun();
+            }
+            // Reset the pickUp_Input flag after processing
             pickUp_Input = false;
         }
     }
+
 
     // Dynamic assignment of weaponScript
     public void AssignWeaponScript(WeaponScript newWeaponScript)
