@@ -27,6 +27,7 @@ public class CameraManager : MonoBehaviour
     public float maximumPivotAngle = 35;
 
     private Camera mainCamera;
+    private bool cameraIsActive = true; // Control camera activity
 
     private void Awake()
     {
@@ -58,11 +59,21 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
-        HandleAllCameraMovement();
+        if (cameraIsActive)
+        {
+            HandleAllCameraMovement();
+        }
+    }
+
+    public void ToggleCameraActive(bool isActive)
+    {
+        cameraIsActive = isActive;
     }
 
     public void HandleAllCameraMovement()
     {
+        if (!cameraIsActive) return;  // Ensure no movement if deactivated
+
         FollowTarget();
         RotateCamera();
         HandleCameraCollisions();
