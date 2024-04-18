@@ -26,6 +26,8 @@ public class CameraManager : MonoBehaviour
     public float minimumPivotAngle = -35;
     public float maximumPivotAngle = 35;
 
+    private Camera mainCamera;
+
     private void Awake()
     {
         // Initialize singleton instance
@@ -115,4 +117,17 @@ public class CameraManager : MonoBehaviour
         cameraVectorPosition.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPosition, Time.deltaTime * 10);
         cameraTransform.localPosition = cameraVectorPosition;
     }
+
+    public void ChangeCamera(Transform newCameraTransform)
+    {
+        // Change the main camera's position and rotation to the new transform
+        mainCamera.transform.position = newCameraTransform.position;
+        mainCamera.transform.rotation = newCameraTransform.rotation;
+    }
+
+    public void ChangeTarget(Transform newTarget)
+    {
+        targetTransform = newTarget;
+    }
+
 }

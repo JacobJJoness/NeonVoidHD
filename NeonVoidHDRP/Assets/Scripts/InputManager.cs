@@ -8,14 +8,12 @@ public class InputManager : MonoBehaviour
     PlayerMovement playerMovement;
     PickUpController pickUpController;
     AnimatorManager animatorManager;
+    CameraManager cameraManager;
 
-    public WeaponScript weaponScript;  // This will be assigned dynamically.
+    public WeaponScript weaponScript;  // Dynamically assigned.
 
     public Vector2 movementInput;
     public Vector2 cameraInput;
-
-    private CarController nearCar; // Car the player is near
-    private bool isNearCar = false; // Is the player near the car
 
     public float cameraInputX;
     public float cameraInputY;
@@ -32,18 +30,19 @@ public class InputManager : MonoBehaviour
     public bool drop_Input;
     public bool car_exit_Input;
 
-
     public bool dash_Input;
+    public bool isInCar; // Flag to check if the player is inside the car
+    public GameObject playerModel; // Assign the player model in the inspector
 
-    public bool isInCar = false;
-
-
+    public bool isNearCar; // Flag to check if the player is near a car
+    public CarController nearCar; // Reference to the nearby car
 
     private void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
         playerMovement = GetComponent<PlayerMovement>();
         pickUpController = GetComponent<PickUpController>();
+        cameraManager = GetComponent<CameraManager>();
 
         InitializeControls();
     }
@@ -59,8 +58,11 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.B.performed += i => b_Input = true;
             playerControls.PlayerActions.B.canceled += i => b_Input = false;
             playerControls.PlayerActions.X.performed += i => x_Input = true;
+            playerControls.PlayerActions.X.canceled += i => x_Input = false;
             playerControls.PlayerActions.Jump.performed += i => jump_Input = true;
+            playerControls.PlayerActions.Jump.canceled += i => jump_Input = false;
             playerControls.PlayerActions.Dash.performed += i => dash_Input = true;
+            playerControls.PlayerActions.Dash.canceled += i => dash_Input = false;
             playerControls.PlayerActions.Shoot.performed += _ => shoot_Input = true;
             playerControls.PlayerActions.Shoot.canceled += _ => shoot_Input = false;
             playerControls.PlayerActions.PickUp.performed += _ => pickUp_Input = true;
@@ -69,7 +71,6 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.Drop.canceled += _ => drop_Input = false;
             playerControls.PlayerActions.ExitCar.performed += _ => car_exit_Input = true;
             playerControls.PlayerActions.ExitCar.canceled += _ => car_exit_Input = false;
-
         }
     }
 
@@ -94,24 +95,6 @@ public class InputManager : MonoBehaviour
 
     public void HandleAllInputs()
     {
-        if (isInCar)
-        {
-            HandleCarInput();
-        }
-        else
-        {
-
-            HandleStandardInputs();          
-        }
-
-        if (car_exit_Input && isInCar)
-        {
-            HandleExitCar();
-        }
-    }
-
-    private void HandleStandardInputs()
-    {
         HandleMovementInput();
         HandleSprintingInput();
         HandleJumpingInput();
@@ -120,46 +103,31 @@ public class InputManager : MonoBehaviour
         HandleShootInput();
         HandlePickUpInput();
         HandleDropInput();
+        HandleCarInputs();
     }
 
-    private void HandleCarInput()
+    private void HandleCarInputs()
     {
-        // Handle car-specific inputs like driving, braking, etc.
+        if (car_exit_Input && isInCar)
+        {
+            HandleExitCar();
+        }
+        else if (car_exit_Input && isNearCar && !isInCar)
+        {
+            EnterCar(nearCar);
+        }
+        car_exit_Input = false; // Reset the car exit input flag
     }
-
-    private void HandleExitCar()
-    {
-        Debug.Log("Exiting the car now.");
-        //nearCar.ExitCar(this);
-        isInCar = false;
-        car_exit_Input = false; // Ensure to reset to avoid repeating exit
-    }
-
-    // Add similar method for entering the car
-    public void EnterCar()
-    {
-        Debug.Log("Entering the car now.");
-        isInCar = true;
-        // Code to switch controls to the car and adjust the camera
-    }
-
-    public void SetNearCar(CarController car, bool isNear)
-    {
-        nearCar = isNear ? car : null;
-        isNearCar = isNear;
-    }
-
-
 
     private void HandleDropInput()
     {
         if (drop_Input)
         {
             Debug.Log("Drop input received.");
-            drop_Input = false; // Reset the input flag
+            drop_Input = false;
             if (pickUpController != null)
             {
-                pickUpController.DropGun(); // Call DropGun method
+                pickUpController.DropGun();
             }
             else
             {
@@ -167,6 +135,7 @@ public class InputManager : MonoBehaviour
             }
         }
     }
+
     private void HandleMovementInput()
     {
         verticalInput = movementInput.y;
@@ -230,25 +199,11 @@ public class InputManager : MonoBehaviour
     {
         if (pickUp_Input)
         {
-            if (isNearCar && nearCar != null)
-            {
-                // Enter the car and pass this InputManager instance
-                //nearCar.EnterCar(this);
-                // Note: The camera switch is handled within the EnterCar() now
-                isInCar = true;
-            }
-            else
-            {
-                // Proceed to pick up items as usual if not near the car
-                pickUpController.PickUpGun();
-            }
-            // Reset the pickUp_Input flag after processing
+            pickUpController.PickUpGun();
             pickUp_Input = false;
         }
     }
 
-
-    // Dynamic assignment of weaponScript
     public void AssignWeaponScript(WeaponScript newWeaponScript)
     {
         weaponScript = newWeaponScript;
@@ -256,4 +211,38 @@ public class InputManager : MonoBehaviour
         Debug.Log("WeaponScript assigned and can shoot enabled");
     }
 
+    public void HandleExitCar()
+    {
+        if (!isInCar) return;
+
+        isInCar = false;
+        playerModel.SetActive(true);
+        Debug.Log("Exited the car.");
+    }
+
+    public void EnterCar(CarController car)
+    {
+        if (!isNearCar || nearCar == null) return;
+
+        isInCar = true;
+        playerModel.SetActive(false);
+        cameraManager.ChangeTarget(car.carCameraTransform);
+        Debug.Log("Entered the car.");
+    }
+
+    public void SetNearCar(CarController car, bool isNear)
+    {
+        nearCar = isNear ? car : null;
+        isNearCar = isNear;
+
+        // Add debug statements to log the status change
+        if (isNear)
+        {
+            Debug.Log("Player is now near the car: " + car.gameObject.name);
+        }
+        else
+        {
+            Debug.Log("Player is no longer near the car");
+        }
+    }
 }
