@@ -102,6 +102,24 @@ public class PickUpController : MonoBehaviour
 
     private void ShootGun()
     {
-        Debug.Log("Shooting gun");
+        if (currentGun != null)
+        {
+            Debug.Log("Attempting to shoot gun.");
+            WeaponScript weaponScript = currentGun.GetComponent<WeaponScript>();
+            if (weaponScript != null && weaponScript.canShoot)
+            {
+                // Call weapon script shoot method or handle shooting logic here
+                Debug.Log("Gun fired.");
+            }
+            else
+            {
+                Debug.Log("Gun cannot shoot or script missing.");
+            }
+        }
+        else
+        {
+            Debug.Log("No gun to shoot.");
+        }
     }
+
 }
