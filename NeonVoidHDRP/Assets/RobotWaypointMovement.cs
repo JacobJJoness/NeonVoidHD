@@ -41,7 +41,7 @@ public class RobotWaypointMovement : MonoBehaviour
     {
         if (waypoints.Length == 0)
         {
-            Debug.LogError("No waypoints assigned to the robot!");
+            
             return;
         }
 

@@ -62,25 +62,35 @@ public class PickUpController : MonoBehaviour
         if (currentGun == null && isNearGun && gunInScene != null)
         {
             // Parent the gun in the scene to the gunHolder
-            gunInScene.transform.parent = gunHolder;
+            gunInScene.transform.SetParent(gunHolder);
             gunInScene.transform.localPosition = new Vector3(0.2f, 1.1f, 0.7f);
-            gunInScene.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            gunInScene.transform.localRotation = Quaternion.identity; // Simplify rotation setting
 
+            // Get the WeaponScript component from the gun
             WeaponScript weaponScript = gunInScene.GetComponent<WeaponScript>();
             if (weaponScript != null)
             {
                 weaponScript.canShoot = true;
                 inputManager.weaponScript = weaponScript;
             }
+            else
+            {
+                Debug.LogError("WeaponScript missing from the gun prefab.");
+            }
 
-            // Disable the pickup prompt
+            // Disable the pickup prompt, if it exists
             if (pickUpPrompt != null)
+            {
                 pickUpPrompt.SetActive(false);
+            }
 
             // Set the gun in the scene as the current gun
             currentGun = gunInScene;
-
-            Debug.Log("Gun picked up and configured");
+            Debug.Log("Gun picked up and configured.");
+        }
+        else
+        {
+            Debug.LogWarning("Pick up conditions not met or gun already in hand.");
         }
     }
 
@@ -89,19 +99,69 @@ public class PickUpController : MonoBehaviour
     {
         if (currentGun != null)
         {
-            
-                
-            gunInScene.transform.position = currentGun.transform.position; // Drop at current location
+            Debug.Log("Dropping gun: " + currentGun.name);
 
-            Destroy(currentGun); // Destroy the instantiated gun
+            // Unparent the gun from the gun holder and ensure it remains active
+            currentGun.SetActive(true);
+            currentGun.transform.SetParent(null);
+
+            // Position the gun at an adjusted height to prevent it from going into the ground
+            Vector3 dropPosition = new Vector3(gunHolder.position.x, gunHolder.position.y + 0.5f, gunHolder.position.z);
+            currentGun.transform.position = dropPosition;
+
+            // Disable the gun's shooting capability
+            WeaponScript weaponScript = currentGun.GetComponent<WeaponScript>();
+            if (weaponScript != null)
+            {
+                weaponScript.canShoot = false;
+            }
+            else
+            {
+                Debug.LogError("WeaponScript missing from the gun being dropped.");
+            }
+
+            // Ensure there is a Collider for interaction, adding one if necessary
+            Collider gunCollider = currentGun.GetComponent<Collider>();
+            if (gunCollider == null)
+            {
+                gunCollider = currentGun.AddComponent<BoxCollider>();
+            }
+            gunCollider.enabled = true;
+
+            // Log the drop location and clear the reference to currentGun
+            Debug.Log("Gun dropped at position: " + dropPosition);
             currentGun = null;
-
-            Debug.Log("Gun dropped.");
+        }
+        else
+        {
+            Debug.LogWarning("No gun to drop.");
         }
     }
 
+
+
+
+
     private void ShootGun()
     {
-        Debug.Log("Shooting gun");
+        if (currentGun != null)
+        {
+            Debug.Log("Attempting to shoot gun.");
+            WeaponScript weaponScript = currentGun.GetComponent<WeaponScript>();
+            if (weaponScript != null && weaponScript.canShoot)
+            {
+                // Call weapon script shoot method or handle shooting logic here
+                Debug.Log("Gun fired.");
+            }
+            else
+            {
+                Debug.Log("Gun cannot shoot or script missing.");
+            }
+        }
+        else
+        {
+            Debug.Log("No gun to shoot.");
+        }
     }
+
 }

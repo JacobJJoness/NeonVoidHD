@@ -291,6 +291,24 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ExitCar"",
+                    ""type"": ""Button"",
+                    ""id"": ""041592b9-ef49-41a0-a92f-fe2c82da5349"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Punch"",
+                    ""type"": ""Button"",
+                    ""id"": ""155f0d56-ee1a-4bef-bf0e-7b91ab584ec6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -392,6 +410,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Drop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc81ac0b-e138-45ea-bc59-1ae12f4e7630"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ExitCar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dbbefa1a-a6cd-4097-ba02-ed052cf3b5da"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Punch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -411,6 +451,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_PlayerActions_Shoot = m_PlayerActions.FindAction("Shoot", throwIfNotFound: true);
         m_PlayerActions_PickUp = m_PlayerActions.FindAction("PickUp", throwIfNotFound: true);
         m_PlayerActions_Drop = m_PlayerActions.FindAction("Drop", throwIfNotFound: true);
+        m_PlayerActions_ExitCar = m_PlayerActions.FindAction("ExitCar", throwIfNotFound: true);
+        m_PlayerActions_Punch = m_PlayerActions.FindAction("Punch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -533,6 +575,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerActions_Shoot;
     private readonly InputAction m_PlayerActions_PickUp;
     private readonly InputAction m_PlayerActions_Drop;
+    private readonly InputAction m_PlayerActions_ExitCar;
+    private readonly InputAction m_PlayerActions_Punch;
     public struct PlayerActionsActions
     {
         private @PlayerControls m_Wrapper;
@@ -544,6 +588,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Shoot => m_Wrapper.m_PlayerActions_Shoot;
         public InputAction @PickUp => m_Wrapper.m_PlayerActions_PickUp;
         public InputAction @Drop => m_Wrapper.m_PlayerActions_Drop;
+        public InputAction @ExitCar => m_Wrapper.m_PlayerActions_ExitCar;
+        public InputAction @Punch => m_Wrapper.m_PlayerActions_Punch;
         public InputActionMap Get() { return m_Wrapper.m_PlayerActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -574,6 +620,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Drop.started += instance.OnDrop;
             @Drop.performed += instance.OnDrop;
             @Drop.canceled += instance.OnDrop;
+            @ExitCar.started += instance.OnExitCar;
+            @ExitCar.performed += instance.OnExitCar;
+            @ExitCar.canceled += instance.OnExitCar;
+            @Punch.started += instance.OnPunch;
+            @Punch.performed += instance.OnPunch;
+            @Punch.canceled += instance.OnPunch;
         }
 
         private void UnregisterCallbacks(IPlayerActionsActions instance)
@@ -599,6 +651,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Drop.started -= instance.OnDrop;
             @Drop.performed -= instance.OnDrop;
             @Drop.canceled -= instance.OnDrop;
+            @ExitCar.started -= instance.OnExitCar;
+            @ExitCar.performed -= instance.OnExitCar;
+            @ExitCar.canceled -= instance.OnExitCar;
+            @Punch.started -= instance.OnPunch;
+            @Punch.performed -= instance.OnPunch;
+            @Punch.canceled -= instance.OnPunch;
         }
 
         public void RemoveCallbacks(IPlayerActionsActions instance)
@@ -630,5 +688,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnShoot(InputAction.CallbackContext context);
         void OnPickUp(InputAction.CallbackContext context);
         void OnDrop(InputAction.CallbackContext context);
+        void OnExitCar(InputAction.CallbackContext context);
+        void OnPunch(InputAction.CallbackContext context);
     }
 }

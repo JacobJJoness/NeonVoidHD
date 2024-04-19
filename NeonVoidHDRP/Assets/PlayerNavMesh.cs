@@ -6,6 +6,7 @@ public class PlayerNavMesh : MonoBehaviour
     [SerializeField] private Transform movePositionTransform; // Reference to the checkpoint position
     private NavMeshAgent navMeshAgent;
     private Vector3 startPosition; // To hold the initial start position
+    private bool returningToStart = false; // State to check if returning to start
 
     private void Awake()
     {
@@ -14,7 +15,6 @@ public class PlayerNavMesh : MonoBehaviour
         {
             Debug.LogError("NavMeshAgent component is missing on the object.");
         }
-        // Save the initial start position
         startPosition = transform.position;
         navMeshAgent.stoppingDistance = 0.5f; // Set a suitable stopping distance.
     }
@@ -23,29 +23,32 @@ public class PlayerNavMesh : MonoBehaviour
     {
         if (movePositionTransform != null)
         {
-            navMeshAgent.destination = movePositionTransform.position;
-            Debug.Log($"Destination Set To: {movePositionTransform.position}, Remaining Distance: {navMeshAgent.remainingDistance}");
+            if (!returningToStart)
+            {
+                navMeshAgent.destination = movePositionTransform.position;
+                Debug.Log($"Destination Set To: {movePositionTransform.position}, Remaining Distance: {navMeshAgent.remainingDistance}");
+            }
 
             // Check if the agent is within an acceptable range of the destination
             if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
             {
-                Debug.Log("Near the Destination, Restarting Player");
-                RestartPlayer();
+                if (!returningToStart)
+                {
+                    Debug.Log("Near the Destination, Returning to Start");
+                    returningToStart = true;
+                    navMeshAgent.destination = startPosition;
+                }
+                else
+                {
+                    Debug.Log("Returned to Start, Moving to Target Again");
+                    returningToStart = false;
+                    navMeshAgent.destination = movePositionTransform.position;
+                }
             }
         }
         else
         {
             Debug.LogError("Move Position Transform is not assigned.");
         }
-    }
-
-    // Method to restart the player
-    private void RestartPlayer()
-    {
-        // Teleport the player back to the initial start position
-        transform.position = startPosition;
-        // Reset the navmesh destination
-        navMeshAgent.ResetPath();
-        Debug.Log("Player restarted at initial start position.");
     }
 }

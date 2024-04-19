@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ExitMenu : MonoBehaviour
@@ -9,15 +7,16 @@ public class ExitMenu : MonoBehaviour
 
     private bool settingsActive = false; // Flag to track if settings panel is active
 
-    // Start is called before the first frame update
     void Start()
     {
         // Ensure both canvases are initially hidden
         backgroundCanvas.SetActive(false);
         settingsCanvas.SetActive(false);
+
+        // Hide the mouse cursor initially
+        Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         // Check if the player presses the "Escape" key
@@ -27,6 +26,18 @@ public class ExitMenu : MonoBehaviour
             settingsActive = !settingsActive;
             backgroundCanvas.SetActive(settingsActive);
             settingsCanvas.SetActive(settingsActive);
+
+            // Toggle the visibility of the mouse cursor
+            Cursor.visible = settingsActive;
+
+            // Lock or unlock the mouse cursor based on settingsActive
+            Cursor.lockState = settingsActive ? CursorLockMode.None : CursorLockMode.Locked;
+
+            // Pause or resume camera movement by controlling it through CameraManager
+            if (CameraManager.Instance != null)
+            {
+                CameraManager.Instance.ToggleCameraActive(!settingsActive);
+            }
         }
     }
 }
