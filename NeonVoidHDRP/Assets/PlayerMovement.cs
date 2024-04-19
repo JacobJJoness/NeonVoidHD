@@ -52,6 +52,8 @@ public class PlayerMovement : MonoBehaviour
     public float dashDistance = 5;
     public float dashDuration = 1;
 
+    public bool isPunching = false;
+
     //Awake is used instead of start to ensure that the script is loaded before any other script
     private void Awake()
     {
@@ -78,16 +80,26 @@ public class PlayerMovement : MonoBehaviour
         HandlePunch();
     }
 
-    private void HandlePunch()
+    public void HandlePunch()
     {
         if (inputManager.punch_Input)
         {
             inputManager.punch_Input = false;
             Debug.Log("Punch input received.");
 
-            // Trigger punch animation
+            isPunching = true; // Set isPunching to true when the punch starts
             animatorManager.PlayTargetAnimation("Punch", true);
+
+            // Optionally, use a coroutine to reset isPunching if you don't want to use animation events
+            StartCoroutine(ResetPunching());
         }
+    }
+
+
+    IEnumerator ResetPunching()
+    {
+        yield return new WaitForSeconds(0.5f); // Adjust this duration to match your punch animation duration
+        isPunching = false; // Reset isPunching when the animation is likely done
     }
 
     //WASD Movement and Sprinting
@@ -253,6 +265,22 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Something entered the trigger.");
+        if (other.gameObject.CompareTag("Robot") && isPunching) // Ensure damage only occurs during an active punch
+        {
+            Debug.Log("Punch hit the robot.");
+            RobotHealth robotHealth = other.GetComponent<RobotHealth>();
+            if (robotHealth != null)
+            {
+                robotHealth.TakeDamage(10); // Assuming each punch deals 10 damage
+            }
+        }
+    }
+
+
     private void HandleDash()
     {
         if (isDashing)

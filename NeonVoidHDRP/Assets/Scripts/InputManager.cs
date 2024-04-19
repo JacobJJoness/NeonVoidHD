@@ -90,9 +90,10 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        // Directly checking for mouse button input to trigger the punch
+        if (Input.GetMouseButtonDown(0)) // 0 is the left mouse button
         {
-            Debug.Log("Mouse button clicked directly checked");
+            playerMovement.HandlePunch();
         }
         HandleAllInputs();
     }
