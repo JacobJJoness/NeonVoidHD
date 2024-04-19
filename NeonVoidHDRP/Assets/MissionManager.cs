@@ -42,6 +42,7 @@ public class MissionManager : MonoBehaviour
         missionOrder.Add("Jump");
         missionOrder.Add("Dash");
         missionOrder.Add("Move");
+        missionOrder.Add("Punch a Robot to Death");
         InitializeMissions();
         UpdateMissionDisplay(); // Ensure the first mission is displayed on start
     }
@@ -61,17 +62,21 @@ public class MissionManager : MonoBehaviour
             string currentMission = missionOrder[currentMissionIndex];
             currentMissionText.text = $"{currentMission}: Incomplete";
             currentMissionText.color = Color.black; // Set text color to black for incomplete missions
+            Debug.Log("Displaying Mission: " + currentMission);
         }
         else
         {
             currentMissionText.text = "All missions completed!";
             currentMissionText.color = Color.cyan; // Optional color change to indicate completion
+            Debug.Log("No more missions to display.");
         }
     }
 
+
     public void CompleteMission(string missionKey)
     {
-        if (Missions.ContainsKey(missionKey) && missionKey == missionOrder[currentMissionIndex]) // Check if the mission exists and is the current mission
+        Debug.Log("Attempting to complete mission: " + missionKey);
+        if (Missions.ContainsKey(missionKey) && !Missions[missionKey]) // Checking if the mission is in the dictionary and not already completed
         {
             Missions[missionKey] = true;
             currentMissionText.text = $"{missionKey}: Complete";
@@ -79,12 +84,21 @@ public class MissionManager : MonoBehaviour
             Debug.Log($"Mission '{missionKey}' completed!");
             StartCoroutine(WaitAndShowNextMission(5.0f)); // Wait for 5 seconds before showing next mission
         }
+        else
+        {
+            Debug.Log("Mission completion failed. Either not found or already completed.");
+        }
     }
 
     IEnumerator WaitAndShowNextMission(float delay)
     {
         yield return new WaitForSeconds(delay);
-        currentMissionIndex++;
+        // Find the next incomplete mission
+        while (currentMissionIndex < missionOrder.Count && Missions[missionOrder[currentMissionIndex]])
+        {
+            currentMissionIndex++;
+        }
         UpdateMissionDisplay(); // Update the display to the next mission
     }
+
 }

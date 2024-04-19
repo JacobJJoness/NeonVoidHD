@@ -80,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
         HandlePunch();
     }
 
-    private void HandlePunch()
+    public void HandlePunch()
     {
         if (inputManager.punch_Input)
         {
@@ -94,6 +94,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(ResetPunching());
         }
     }
+
 
     IEnumerator ResetPunching()
     {
