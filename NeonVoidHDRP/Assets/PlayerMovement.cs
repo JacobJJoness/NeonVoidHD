@@ -253,6 +253,21 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Something entered the trigger.");
+        if (other.gameObject.CompareTag("Robot"))
+        {
+            Debug.Log("Punch hit the robot.");
+            RobotHealth robotHealth = other.GetComponent<RobotHealth>();
+            if (robotHealth != null)
+            {
+                robotHealth.TakeDamage(10);  // Assuming each punch deals 10 damage
+            }
+        }
+    }
+
     private void HandleDash()
     {
         if (isDashing)

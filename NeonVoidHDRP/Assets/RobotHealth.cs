@@ -20,10 +20,16 @@ public class RobotHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        Debug.Log($"Robot taking {damage} damage.");
         currentHealth -= damage;
-
         healthBar.SetHealth(currentHealth);
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
+
+
 
     private void Die()
     {
