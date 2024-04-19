@@ -14,6 +14,7 @@ public class RobotHealth : MonoBehaviour
 
     private void Start()
     {
+        initialPosition = transform.position;  // Store the initial position at start
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(currentHealth);
     }
@@ -48,12 +49,11 @@ public class RobotHealth : MonoBehaviour
         Invoke("SpawnRobot", delay);
     }
 
+    public GameObject robotPrefab; // Assign this in the Unity editor
+
     private void SpawnRobot()
     {
-        // Instantiate a new instance of the robot prefab at the initial position
-        GameObject newRobot = Instantiate(gameObject, initialPosition, Quaternion.identity);
-
-        // Reset the health of the new robot
+        GameObject newRobot = Instantiate(robotPrefab, initialPosition, Quaternion.identity);
         RobotHealth robotHealth = newRobot.GetComponent<RobotHealth>();
         if (robotHealth != null)
         {
@@ -61,6 +61,6 @@ public class RobotHealth : MonoBehaviour
         }
     }
 
- 
+
 
 }
