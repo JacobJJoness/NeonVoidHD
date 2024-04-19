@@ -70,14 +70,24 @@ public class PlayerMovement : MonoBehaviour
         if (playerManager.isInteracting)
         {
             return;
-
         }
-
-
 
         HandleMovement();
         HandleRotation();
         HandleDash();
+        HandlePunch();
+    }
+
+    private void HandlePunch()
+    {
+        if (inputManager.punch_Input)
+        {
+            inputManager.punch_Input = false;
+            Debug.Log("Punch input received.");
+
+            // Trigger punch animation
+            animatorManager.PlayTargetAnimation("Punch", true);
+        }
     }
 
     //WASD Movement and Sprinting
@@ -86,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
         if (isJumping)
             return;
 
-        moveDirection = cameraObject.forward * inputManager.verticalInput; // Movement Input
+        moveDirection = cameraObject.forward * inputManager.verticalInput;
         moveDirection = moveDirection + cameraObject.right * inputManager.horizontalInput;
         moveDirection.Normalize();
         moveDirection.y = 0;
@@ -105,17 +115,18 @@ public class PlayerMovement : MonoBehaviour
             {
                 moveDirection = moveDirection * walkingSpeed;
             }
-
         }
 
-
-
         Vector3 movementVelocity = moveDirection;
-
         playerRigidbody.velocity = movementVelocity;
 
-
+        if (inputManager.horizontalInput != 0 || inputManager.verticalInput != 0)
+        {
+            // Complete the move mission
+            MissionManager.Instance.CompleteMission("Move");
+        }
     }
+
 
     //Rotating the player to face the direction of movement
     private void HandleRotation()
@@ -219,17 +230,18 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded)
         {
             animatorManager.animator.SetBool("isJumping", true);
-
             animatorManager.PlayTargetAnimation("Jumping", false);
 
             float jumpingVelocity = Mathf.Sqrt(-2 * gravityIntensity * jumpHeight);
             Vector3 playerVelocity = moveDirection;
-
             playerVelocity.y = jumpingVelocity;
             playerRigidbody.velocity = playerVelocity;
 
+            // Complete the jump mission
+            MissionManager.Instance.CompleteMission("Jump");
         }
     }
+
 
     public void HandleDodge()
     {
@@ -269,6 +281,9 @@ public class PlayerMovement : MonoBehaviour
             dashDirection += cameraObject.right * inputManager.horizontalInput;
             dashDirection.Normalize();
             dashDirection.y = 0f;
+
+            // Complete the dash mission
+            MissionManager.Instance.CompleteMission("Dash");
         }
     }
 }

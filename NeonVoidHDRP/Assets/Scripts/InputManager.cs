@@ -29,6 +29,7 @@ public class InputManager : MonoBehaviour
     public bool pickUp_Input;
     public bool drop_Input;
     public bool car_exit_Input;
+    public bool punch_Input;
 
     public bool dash_Input;
     public bool isInCar; // Flag to check if the player is inside the car
@@ -71,6 +72,9 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerActions.Drop.canceled += _ => drop_Input = false;
             playerControls.PlayerActions.ExitCar.performed += _ => car_exit_Input = true;
             playerControls.PlayerActions.ExitCar.canceled += _ => car_exit_Input = false;
+
+            playerControls.PlayerActions.Punch.performed += _ => punch_Input = true;
+            playerControls.PlayerActions.Punch.canceled += _ => punch_Input = false;
         }
     }
 
@@ -166,6 +170,18 @@ public class InputManager : MonoBehaviour
         {
             dash_Input = false;
             playerMovement.Dash();
+        }
+    }
+
+    private void HandlePunchInput()
+    {
+        if (punch_Input)
+        {
+            punch_Input = false;
+            Debug.Log("Punch input received.");
+
+            // Trigger punch animation
+            animatorManager.PlayTargetAnimation("Punch", true);
         }
     }
 

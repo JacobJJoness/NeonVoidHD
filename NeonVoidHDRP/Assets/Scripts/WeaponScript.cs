@@ -12,6 +12,7 @@ public class WeaponScript : MonoBehaviour
 
     public GameObject gunCameraPrefab; // Prefab of the gun camera
     public GameObject cameraManagerPrefab; // Prefab of the camera manager
+    public int layerType = 0; // Default layer is 'Default'
 
     private GameObject gunCameraInstance; // Instance of the gun camera
     private GameObject cameraManagerInstance; // Instance of the camera manager
@@ -24,6 +25,7 @@ public class WeaponScript : MonoBehaviour
     private void Start()
     {
         mainCamera = Camera.main;
+        gameObject.layer = layerType; // Set the layer of the gun
 
         // Instantiate and disable the gun camera at the start
         if (gunCameraPrefab != null)
@@ -32,23 +34,24 @@ public class WeaponScript : MonoBehaviour
             gunCameraInstance.transform.SetParent(firePoint); // Attach camera to fire point
             gunCameraInstance.transform.localPosition = new Vector3(0, 0.3f, -1.35f); // Position slightly above and behind the fire point
             gunCameraInstance.SetActive(false);
+            gunCameraInstance.layer = layerType; // Set the camera to the same layer as the gun
         }
     }
 
     private void Update()
     {
-        // Check if the player is holding down the right mouse button to activate the gun camera
-        if (Input.GetMouseButtonDown(1))
+        // Check if the player is holding the gun and holding down the right mouse button to activate the gun camera
+        if (canShoot && Input.GetMouseButtonDown(1))
         {
             SwitchToGunCamera();
         }
-        else if (Input.GetMouseButtonUp(1))
+        else if (canShoot && Input.GetMouseButtonUp(1))
         {
             SwitchToMainCamera();
         }
 
-        // Rotate the gun camera with the mouse if it is active
-        if (gunCameraInstance != null && gunCameraInstance.activeSelf)
+        // Rotate the gun camera with the mouse if it is active and the player is holding the gun
+        if (canShoot && gunCameraInstance != null && gunCameraInstance.activeSelf)
         {
             RotateGunCamera();
         }
@@ -74,6 +77,7 @@ public class WeaponScript : MonoBehaviour
         }
 
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        bullet.layer = layerType; // Set the layer of the bullet
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -95,6 +99,7 @@ public class WeaponScript : MonoBehaviour
             if (cameraManagerInstance == null)
             {
                 cameraManagerInstance = Instantiate(cameraManagerPrefab);
+                cameraManagerInstance.layer = layerType; // Set the layer of the camera manager
             }
 
             cameraManagerInstance.SetActive(false);
