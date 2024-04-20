@@ -210,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
+        //Debug.Log("IsInteracting boolean is set to " + playerManager.isInteracting); // To check if it true or false
 
     }
 

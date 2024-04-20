@@ -10,7 +10,9 @@ public class EnemyReferences : MonoBehaviour
 
     [Header("Stats")]
     public float pathUpdateDelay = 0.2f;
-
+    [Header("Projectile")]
+    public GameObject projectilePrefab;
+    public float projectileForce = 10f; // Variable for the force applied to the projectile
 
     private void Awake()
     {
