@@ -1,110 +1,107 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
     private Transform target;
     private EnemyReferences enemyReferences;
-    private float shootingDistance;
-    private float pathUpdateDeadLine;
+    private float shootingDistance = 5f;
+    private float punchingDistance = 2f;  // Distance within which the enemy will punch
     private float lastShootTime;
+    private float pathUpdateInterval;
+
+    private Animator animator;  // Reference to the Animator component
 
     private void Awake()
     {
         enemyReferences = GetComponent<EnemyReferences>();
         target = GameObject.FindGameObjectWithTag("Player").transform;
+        pathUpdateInterval = enemyReferences.pathUpdateDelay;
+        animator = GetComponent<Animator>();  // Get the Animator component
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         shootingDistance = enemyReferences.navMeshAgent.stoppingDistance;
-        lastShootTime = -1f;
+        lastShootTime = Time.time;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (target != null)
         {
-            bool inRange = Mathf.Floor(Vector3.Distance(transform.position, target.position)) <= shootingDistance;
-            Debug.Log(Vector3.Distance(transform.position, target.position));
-            if (inRange)
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+            // Check if the enemy should punch
+            if (distanceToTarget <= punchingDistance)
+            {
+                PunchTarget();
+            }
+            else if (distanceToTarget <= shootingDistance && distanceToTarget > punchingDistance)
             {
                 LookAtTarget();
-
-                // Check if enough time has passed since the last shoot
                 if (Time.time - lastShootTime >= 1f)
                 {
                     ShootAtTarget();
-                    lastShootTime = Time.time; // Update the last shoot time
+                    lastShootTime = Time.time;
                 }
             }
-            else
+            else if (Time.time >= lastShootTime + pathUpdateInterval)
             {
                 UpdatePath();
+                lastShootTime = Time.time;  // Using the same time tracking for shooting and path updates for simplicity
             }
-
         }
     }
 
+    private void PunchTarget()
+    {
+        Debug.Log("Enemy punching player!");
+
+        // Trigger the punch animation
+        animator.SetTrigger("EnemyAttack");
+
+        // Here you could also apply damage to the player if you're handling health reduction on punch
+        // For example, assuming PlayerHealth script is attached to the player
+        PlayerHealth playerHealth = target.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(10);  // Assume punching deals 10 damage
+        }
+    }
 
     private void ShootAtTarget()
     {
-        Debug.Log("Shoot at player");
         Vector3 shootingPointOffset = new Vector3(0f, 1.5f, 0f);
+        Vector3 shootDirection = (target.position - transform.position).normalized;
 
-        Transform shootingPoint = transform;
-        // Ensure that the enemy has references to the projectile prefab and shooting point
-        if (enemyReferences.projectilePrefab != null && shootingPoint != null)
+        if (enemyReferences.projectilePrefab != null)
         {
-            // Calculate shoot direction
-            Vector3 shootDirection = (target.position) - shootingPoint.position;
+            GameObject projectile = Instantiate(
+                enemyReferences.projectilePrefab,
+                transform.position + shootingPointOffset,
+                Quaternion.LookRotation(shootDirection)
+            );
 
-            // Ensure that the shoot direction is not purely vertical
-            if (shootDirection != Vector3.zero)
+            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+            if (projectileRb != null)
             {
-                // Normalize the shoot direction
-                shootDirection.Normalize();
-
-
-                // Instantiate a projectile at the shooting point's position and rotation
-                GameObject projectile = Instantiate(enemyReferences.projectilePrefab, shootingPoint.position + shootingPointOffset, Quaternion.identity);
-
-                // Optionally, you can apply force or velocity to the projectile
-                Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-                if (projectileRb != null)
-                {
-                    // Apply force towards the player's position
-                    projectileRb.AddForce(shootDirection * enemyReferences.projectileForce, ForceMode.Impulse);
-
-                    // Apply rotation towards where the player is/was.
-                    projectile.transform.rotation = Quaternion.LookRotation(shootDirection, Vector3.up) * enemyReferences.projectilePrefab.transform.rotation;
-                }
-
-                // Destroy projectile after 5 seconds
-                Destroy(projectile, 5f);
+                projectileRb.AddForce(shootDirection * enemyReferences.projectileForce, ForceMode.Impulse);
             }
+
+            Destroy(projectile, 5f);  // Adjust time as needed for your game design
         }
     }
 
-
     private void LookAtTarget()
     {
-        Vector3 lookPos = target.position - transform.position;
-        lookPos.y = 0;
-        Quaternion rotation = Quaternion.LookRotation(lookPos);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 0.2f);
+        Vector3 direction = (target.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5);
     }
 
     private void UpdatePath()
     {
-        if (Time.time >= pathUpdateDeadLine)
-        {
-            //Debug.Log("Updating Enemy Path");
-            pathUpdateDeadLine = Time.time + enemyReferences.pathUpdateDelay;
-            enemyReferences.navMeshAgent.SetDestination(target.position);
-        }
+        enemyReferences.navMeshAgent.SetDestination(target.position);
     }
 }
