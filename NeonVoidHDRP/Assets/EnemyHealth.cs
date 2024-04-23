@@ -26,7 +26,9 @@ public class EnemyHealth : MonoBehaviour
     {
         if (isDead) return;  // Ignore damage if already dead
 
+        Debug.Log(gameObject.name + " took " + damage + " damage."); // Log the damage received
         currentHealth -= damage;
+
         if (healthBar != null)
         {
             healthBar.SetHealth(currentHealth);  // Update the health bar when taking damage
@@ -37,6 +39,7 @@ public class EnemyHealth : MonoBehaviour
             Die();
         }
     }
+
 
     private void Die()
     {

@@ -11,6 +11,8 @@ public class PlayerMovement : MonoBehaviour
 
     InputManager inputManager;
 
+    PickUpController pickupController;
+
     Vector3 moveDirection;
 
     Transform cameraObject;
@@ -62,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
         inputManager = GetComponent<InputManager>();
         playerRigidbody = GetComponent<Rigidbody>();
         cameraObject = Camera.main.transform;
+        pickupController = GetComponent<PickUpController>();
     }
 
     // Update is called once per frame, acting as the Update() method in the PlayerManager script
@@ -82,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandlePunch()
     {
-        if (inputManager.punch_Input)
+        if (inputManager.punch_Input && !pickupController.IsHoldingGun)
         {
             inputManager.punch_Input = false;
             Debug.Log("Punch input received.");
@@ -273,9 +276,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Punch hit the robot.");
             RobotHealth robotHealth = other.GetComponent<RobotHealth>();
+            EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
             if (robotHealth != null)
             {
                 robotHealth.TakeDamage(10); // Assuming each punch deals 10 damage
+                enemyHealth.TakeDamage(10);
             }
         }
     }

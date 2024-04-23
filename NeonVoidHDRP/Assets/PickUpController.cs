@@ -5,17 +5,22 @@ public class PickUpController : MonoBehaviour
     public GameObject gunPrefab; // The gun prefab to instantiate when picked up
     public Transform gunHolder; // The transform where the gun will be parented (e.g., hand bone)
     public GameObject pickUpPrompt; // The UI element that prompts the player to pick up the gun
-
+    public Animator animator;
     private GameObject currentGun = null; // The current gun the player is holding
     private GameObject gunInScene = null; // Reference to the interactable gun in the scene
     private bool isNearGun = false; // Flag to check if the player is near a gun
 
     private InputManager inputManager;
 
+    public bool IsHoldingGun { get; private set; } = false;
+
+    public GameObject playerGun;
+
     private void Start()
     {
         inputManager = GetComponent<InputManager>(); // Make sure the InputManager is attached to the same GameObject
         pickUpPrompt.SetActive(false); // Ensure the pickup prompt is hidden by default
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -30,12 +35,14 @@ public class PickUpController : MonoBehaviour
             DropGun();
         }
 
+        // Ensure pickup is only triggered by the correct input and conditions
         if (isNearGun && inputManager.pickUp_Input)
         {
-            inputManager.pickUp_Input = false; // Reset the pickUp_Input flag to prevent repeated pickups
+            inputManager.pickUp_Input = false; // Prevent continuous pickup on holding the key
             PickUpGun();
         }
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -44,6 +51,7 @@ public class PickUpController : MonoBehaviour
             isNearGun = true;
             gunInScene = other.gameObject; // Store reference to the gun object
             pickUpPrompt.SetActive(true); // Show the pickup prompt
+            Debug.Log("Player is near a gun.");
         }
     }
 
@@ -61,32 +69,41 @@ public class PickUpController : MonoBehaviour
     {
         if (currentGun == null && isNearGun && gunInScene != null)
         {
-            // Parent the gun in the scene to the gunHolder
-            gunInScene.transform.SetParent(gunHolder);
-            gunInScene.transform.localPosition = new Vector3(0.2f, 1.1f, 0.7f);
-            gunInScene.transform.localRotation = Quaternion.identity; // Simplify rotation setting
+            Debug.Log("Picking up gun now.");
 
-            // Get the WeaponScript component from the gun
-            WeaponScript weaponScript = gunInScene.GetComponent<WeaponScript>();
-            if (weaponScript != null)
+            // Activate the player's gun object
+            if (playerGun != null)
             {
-                weaponScript.canShoot = true;
-                inputManager.weaponScript = weaponScript;
+                playerGun.SetActive(true);  // Activate the player gun
+                currentGun = playerGun;  // Set the current gun reference
+
+                // Ensure the gun can shoot
+                WeaponScript weaponScript = currentGun.GetComponent<WeaponScript>();
+                if (weaponScript != null)
+                {
+                    weaponScript.canShoot = true;  // Enable shooting
+                    inputManager.weaponScript = weaponScript;  // Assign the script to the input manager if necessary
+                }
+                else
+                {
+                    Debug.LogError("WeaponScript missing from the player gun.");
+                }
             }
             else
             {
-                Debug.LogError("WeaponScript missing from the gun prefab.");
+                Debug.LogError("Player gun is not assigned in the Inspector");
             }
 
-            // Disable the pickup prompt, if it exists
-            if (pickUpPrompt != null)
+            IsHoldingGun = true;
+
+            if (animator != null)
             {
-                pickUpPrompt.SetActive(false);
+                animator.SetBool("isHoldingGun", true);
             }
 
-            // Set the gun in the scene as the current gun
-            currentGun = gunInScene;
-            Debug.Log("Gun picked up and configured.");
+            // Optionally deactivate the gun in the scene
+            gunInScene.SetActive(false);
+            Debug.Log("Gun in scene deactivated, and player gun activated.");
         }
         else
         {
@@ -95,41 +112,54 @@ public class PickUpController : MonoBehaviour
     }
 
 
+
+
     public void DropGun()
     {
         if (currentGun != null)
         {
             Debug.Log("Dropping gun: " + currentGun.name);
 
-            // Unparent the gun from the gun holder and ensure it remains active
-            currentGun.SetActive(true);
-            currentGun.transform.SetParent(null);
-
-            // Position the gun at an adjusted height to prevent it from going into the ground
+            // Instantiate a copy of the gun in the scene at the specified drop position
             Vector3 dropPosition = new Vector3(gunHolder.position.x, gunHolder.position.y + 0.5f, gunHolder.position.z);
-            currentGun.transform.position = dropPosition;
+            GameObject droppedGun = Instantiate(gunPrefab, dropPosition, Quaternion.identity);
 
-            // Disable the gun's shooting capability
-            WeaponScript weaponScript = currentGun.GetComponent<WeaponScript>();
+            // Optionally disable any shooting capability initially or reset other settings
+            WeaponScript weaponScript = droppedGun.GetComponent<WeaponScript>();
             if (weaponScript != null)
             {
-                weaponScript.canShoot = false;
-            }
-            else
-            {
-                Debug.LogError("WeaponScript missing from the gun being dropped.");
+                weaponScript.canShoot = false; // Ensure the dropped gun cannot shoot
             }
 
-            // Ensure there is a Collider for interaction, adding one if necessary
-            Collider gunCollider = currentGun.GetComponent<Collider>();
+            if (animator != null)
+            {
+                animator.SetBool("isHoldingGun", false);
+            }
+
+            // Deactivate the current gun (held by the player)
+            currentGun.SetActive(false);
+
+            // Also ensure no residual shooting capabilities
+            WeaponScript currentGunScript = currentGun.GetComponent<WeaponScript>();
+            if (currentGunScript != null)
+            {
+                currentGunScript.canShoot = false; // Disable shooting capability of the gun being held
+            }
+
+            IsHoldingGun = false;
+
+            // Ensure there is a Collider for interaction, set it to active
+            Collider gunCollider = droppedGun.GetComponent<Collider>();
             if (gunCollider == null)
             {
-                gunCollider = currentGun.AddComponent<BoxCollider>();
+                gunCollider = droppedGun.AddComponent<BoxCollider>(); // Add a collider if not present
             }
             gunCollider.enabled = true;
 
-            // Log the drop location and clear the reference to currentGun
+            // Log the drop action
             Debug.Log("Gun dropped at position: " + dropPosition);
+
+            // Clear the currentGun reference to prevent further interactions with it
             currentGun = null;
         }
         else
@@ -137,6 +167,8 @@ public class PickUpController : MonoBehaviour
             Debug.LogWarning("No gun to drop.");
         }
     }
+
+
 
 
 
