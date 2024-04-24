@@ -195,7 +195,7 @@ public class PlayerMovement : MonoBehaviour
             playerRigidbody.AddForce(-Vector3.up * fallingVelocity * inAirTimer);
 
             // Debugging: Indicate that the player is currently in the air and not grounded
-           // Debug.Log("Player is in the air");
+            // Debug.Log("Player is in the air");
         }
 
 
@@ -299,7 +299,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                playerRigidbody.velocity = dashDirection * dashDistance / dashDuration;
+                playerRigidbody.velocity = dashDirection * dashDistance / (dashDuration / 2);
             }
         }
     }
