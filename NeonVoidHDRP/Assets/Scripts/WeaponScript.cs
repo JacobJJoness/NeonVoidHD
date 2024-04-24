@@ -9,7 +9,6 @@ public class WeaponScript : MonoBehaviour
     private float nextFireTime = 0f; // Time when the next shot can be fired
 
     public bool canShoot = false; // Only true when the gun is picked up
-
     public GameObject gunCameraPrefab; // Prefab of the gun camera
     public GameObject cameraManagerPrefab; // Prefab of the camera manager
     public int layerType = 0; // Default layer is 'Default'
@@ -22,10 +21,15 @@ public class WeaponScript : MonoBehaviour
     private Vector2 cameraRotation; // Stores current rotation of the camera
     public float cameraSensitivity = 100f; // Sensitivity of camera rotation
 
+    public AudioClip shootSound; // The sound clip that plays when shooting
+    private AudioSource audioSource; // AudioSource component to play sounds
+
     private void Start()
     {
         mainCamera = Camera.main;
         gameObject.layer = layerType; // Set the layer of the gun
+
+        audioSource = gameObject.AddComponent<AudioSource>(); // Add AudioSource component dynamically
 
         // Instantiate and disable the gun camera at the start
         if (gunCameraPrefab != null)
@@ -84,6 +88,7 @@ public class WeaponScript : MonoBehaviour
             rb.AddForce(firePoint.forward * bulletSpeed, ForceMode.Impulse);
             Destroy(bullet, 3f); // Destroy bullet after some time
             nextFireTime = Time.time + fireRate;
+            audioSource.PlayOneShot(shootSound); // Play shooting sound
         }
         else
         {
