@@ -4,39 +4,58 @@ public class ExitMenu : MonoBehaviour
 {
     public GameObject backgroundCanvas; // Reference to the background canvas GameObject
     public GameObject settingsCanvas; // Reference to the settings canvas GameObject
+    public GameObject optionScreen; // Reference to the option screen GameObject
 
-    private bool settingsActive = false; // Flag to track if settings panel is active
-
-    void Start()
+    private void Start()
     {
-        // Ensure both canvases are initially hidden
+        // Ensure all UI elements are initially hidden
         backgroundCanvas.SetActive(false);
         settingsCanvas.SetActive(false);
+        // Do not automatically deactivate optionScreen here in case you want it to be initially active.
 
         // Hide the mouse cursor initially
         Cursor.visible = false;
     }
 
-    void Update()
+    private void Update()
     {
         // Check if the player presses the "Escape" key
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Toggle the visibility of both canvases
-            settingsActive = !settingsActive;
-            backgroundCanvas.SetActive(settingsActive);
-            settingsCanvas.SetActive(settingsActive);
-
-            // Toggle the visibility of the mouse cursor
-            Cursor.visible = settingsActive;
-
-            // Lock or unlock the mouse cursor based on settingsActive
-            Cursor.lockState = settingsActive ? CursorLockMode.None : CursorLockMode.Locked;
-
-            // Pause or resume camera movement by controlling it through CameraManager
-            if (CameraManager.Instance != null)
+            // Check if the option screen is active
+            if (optionScreen.activeSelf)
             {
-                CameraManager.Instance.ToggleCameraActive(!settingsActive);
+                // Deactivate the option screen and other related UI components
+                optionScreen.SetActive(false);
+                backgroundCanvas.SetActive(false);
+                settingsCanvas.SetActive(false);
+
+                // Ensure the cursor is not visible and the mouse cursor is locked
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                // Optionally, resume camera movement or other gameplay elements
+                if (CameraManager.Instance != null)
+                {
+                    CameraManager.Instance.ToggleCameraActive(true);
+                }
+            }
+            else
+            {
+                // Toggle the visibility of background and settings canvas based on current state
+                bool isActive = !backgroundCanvas.activeSelf; // Determine the new active state
+                backgroundCanvas.SetActive(isActive);
+                settingsCanvas.SetActive(isActive);
+
+                // Adjust the cursor visibility and lock state accordingly
+                Cursor.visible = isActive;
+                Cursor.lockState = isActive ? CursorLockMode.None : CursorLockMode.Locked;
+
+                // Adjust camera activity based on the UI state
+                if (CameraManager.Instance != null)
+                {
+                    CameraManager.Instance.ToggleCameraActive(!isActive);
+                }
             }
         }
     }
