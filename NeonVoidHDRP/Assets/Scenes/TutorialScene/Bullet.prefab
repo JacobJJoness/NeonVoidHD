@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 613393511189663864}
   - component: {fileID: 7205021602207483220}
   - component: {fileID: 4590562917491219896}
-  - component: {fileID: 2833247944582604043}
+  - component: {fileID: 7027751392222633187}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,7 +105,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.69
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &4590562917491219896
 Rigidbody:
@@ -129,12 +129,12 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2833247944582604043
+--- !u!114 &7027751392222633187
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
