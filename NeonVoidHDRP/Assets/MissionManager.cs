@@ -21,7 +21,7 @@ public class MissionManager : MonoBehaviour
     public TMP_Text currentMissionText;  // Direct reference to the TextMeshPro UI element
 
     private List<string> missionOrder = new List<string>(); // List to keep missions in order
-    private Dictionary<string, bool> Missions = new Dictionary<string, bool>(); // Dictionary to store mission status
+    internal Dictionary<string, bool> Missions = new Dictionary<string, bool>(); // Dictionary to store mission status, accessible within the same assembly
     private int currentMissionIndex = 0; // Index to track the current mission
 
     private void Awake()
@@ -29,7 +29,7 @@ public class MissionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Optional: Makes it persist across scenes
+            DontDestroyOnLoad(gameObject); // Makes it persist across scenes
         }
         else
         {
@@ -55,6 +55,31 @@ public class MissionManager : MonoBehaviour
         }
     }
 
+    public void AddMission(string missionName)
+    {
+        if (!Missions.ContainsKey(missionName))
+        {
+            Missions.Add(missionName, false);
+            missionOrder.Add(missionName);
+            UpdateMissionDisplay();
+        }
+        else
+        {
+            Debug.Log("Mission already exists.");
+        }
+    }
+
+    public bool AreAllMissionsComplete()
+    {
+        foreach (var status in Missions.Values)
+        {
+            if (!status) return false;
+        }
+        return true;
+    }
+
+
+
     void UpdateMissionDisplay()
     {
         if (currentMissionIndex < missionOrder.Count)
@@ -72,11 +97,10 @@ public class MissionManager : MonoBehaviour
         }
     }
 
-
     public void CompleteMission(string missionKey)
     {
         Debug.Log("Attempting to complete mission: " + missionKey);
-        if (Missions.ContainsKey(missionKey) && !Missions[missionKey]) // Checking if the mission is in the dictionary and not already completed
+        if (Missions.ContainsKey(missionKey) && !Missions[missionKey])
         {
             Missions[missionKey] = true;
             currentMissionText.text = $"{missionKey}: Complete";
@@ -100,5 +124,4 @@ public class MissionManager : MonoBehaviour
         }
         UpdateMissionDisplay(); // Update the display to the next mission
     }
-
 }

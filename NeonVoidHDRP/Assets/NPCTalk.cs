@@ -2,24 +2,37 @@ using UnityEngine;
 
 public class NPCTalk : MonoBehaviour
 {
-    public GameObject portalPrefab;
+    public GameObject portalPrefab;  // Assuming this is for other purposes too
+    public DialogueCanvasController dialogueCanvasController;  // Reference to the dialogue controller
+    public string offeredMissionName;  // Name of the mission this NPC will offer
     private bool isPlayerInside = false;
     private bool hasInteracted = false;
 
+    void Start()
+    {
+        // Subscribe to the mission accepted event
+        if (dialogueCanvasController != null)
+        {
+            dialogueCanvasController.OnMissionAccepted += HandleMissionAccepted;
+        }
+        else
+        {
+            Debug.LogError("DialogueCanvasController is not assigned in NPCTalk.");
+        }
+    }
+
     private void Update()
     {
-        // Check if the player is inside the NPC's trigger zone
-        if (isPlayerInside)
+        if (isPlayerInside && Input.GetKeyDown(KeyCode.E) && !hasInteracted)
         {
-            // If the player hasn't interacted yet and presses the "E" key, toggle the portal
-            if (!hasInteracted && Input.GetKeyDown(KeyCode.E))
+            // Check if all missions are completed before showing new mission dialog
+            if (MissionManager.Instance.AreAllMissionsComplete())
             {
-                TogglePortal();
+                ShowMissionDialogue();
             }
-            // If the portal is active and the player presses the "E" key again, deactivate the portal
-            else if (hasInteracted && Input.GetKeyDown(KeyCode.E))
+            else
             {
-                DeactivatePortal();
+                Debug.Log("Complete all current missions before proceeding.");
             }
         }
     }
@@ -29,7 +42,7 @@ public class NPCTalk : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Player entered NPC's trigger zone.");
-            isPlayerInside = true; // Set flag to indicate player is inside the trigger zone
+            isPlayerInside = true;
         }
     }
 
@@ -38,28 +51,38 @@ public class NPCTalk : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Player exited NPC's trigger zone.");
-            isPlayerInside = false; // Reset flag when player exits the trigger zone
-            // If the player hasn't interacted yet, deactivate the portal object prefab
-            if (!hasInteracted)
-            {
-                portalPrefab.SetActive(false);
-            }
+            isPlayerInside = false;
+            hasInteracted = false; // Reset interaction flag when player exits the zone
         }
     }
 
-    private void TogglePortal()
+    private void ShowMissionDialogue()
     {
-        Debug.Log("Player interacted with NPC.");
-        // Toggle the portal object prefab
-        portalPrefab.SetActive(!portalPrefab.activeSelf);
-        hasInteracted = true; // Set the flag to indicate interaction
+        if (!hasInteracted)
+        {
+            Debug.Log("Player interacts with NPC to discuss mission.");
+            Mission mission = new Mission(offeredMissionName);
+            dialogueCanvasController.ShowMission(mission);
+            hasInteracted = true;
+        }
     }
 
-    private void DeactivatePortal()
+    private void HandleMissionAccepted(bool accepted)
     {
-        Debug.Log("Player deactivated the portal.");
-        // Deactivate the portal object prefab
-        portalPrefab.SetActive(false);
-        hasInteracted = false; // Reset the interaction flag
+        if (accepted)
+        {
+            portalPrefab.SetActive(true);
+            // Optionally reset hasInteracted to allow new interactions
+            hasInteracted = false;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe to prevent memory leaks
+        if (dialogueCanvasController != null)
+        {
+            dialogueCanvasController.OnMissionAccepted -= HandleMissionAccepted;
+        }
     }
 }

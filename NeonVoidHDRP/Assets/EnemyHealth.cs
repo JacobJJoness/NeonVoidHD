@@ -44,6 +44,7 @@ public class EnemyHealth : MonoBehaviour
     private void Die()
     {
         isDead = true;
+        MissionManager.Instance.CompleteMission("Kill an Enemy");
         Debug.Log(gameObject.name + " is Dead!");
         if (deathEffect != null)
         {
